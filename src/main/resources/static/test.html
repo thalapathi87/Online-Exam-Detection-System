@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Java Online Test</title>
+
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background: #f8fafc;
+          padding: 30px;
+        }
+
+        .box {
+          max-width: 600px;
+          margin: auto;
+          background: white;
+          padding: 25px;
+          border-radius: 8px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          display: none; /* 🔴 hidden until permission */
+        }
+
+        h2 {
+          text-align: center;
+        }
+
+        .timer {
+          text-align: right;
+          font-weight: bold;
+          color: red;
+        }
+
+        .option {
+          margin: 10px 0;
+        }
+
+        button {
+          margin-top: 15px;
+          padding: 10px 20px;
+          background: #2563eb;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+        button:hover {
+          background: #1e40af;
+        }
+
+        .permission {
+          max-width: 600px;
+          margin: auto;
+          background: white;
+          padding: 30px;
+          border-radius: 8px;
+          text-align: center;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- PERMISSION SCREEN -->
+<div class="permission" id="permissionBox">
+    <h2>Camera & Microphone Required</h2>
+    <p>This test requires camera and microphone access.</p>
+    <button onclick="requestPermission()">Allow & Start Test</button>
+</div>
+
+<!-- EXAM -->
+<div class="box" id="examBox">
+    <h2>Java Online Test</h2>
+    <p><b>User:</b> <span id="user"></span></p>
+    <div class="timer">Time Left: <span id="time">60</span>s</div>
+
+    <p id="question"></p>
+
+    <div class="option"><input type="radio" name="opt" value="a"> <span id="a"></span></div>
+    <div class="option"><input type="radio" name="opt" value="b"> <span id="b"></span></div>
+    <div class="option"><input type="radio" name="opt" value="c"> <span id="c"></span></div>
+    <div class="option"><input type="radio" name="opt" value="d"> <span id="d"></span></div>
+
+    <button onclick="nextQuestion()">Next</button>
+</div>
+
+<script>
+    document.getElementById("user").innerText =
+      localStorage.getItem("name") + " (" + localStorage.getItem("email") + ")";
+
+    // QUESTIONS
+   const questions = [
+  {
+    q: "What is the output?\nString a = \"Hello\";\nString b = \"He\" + \"llo\";\nSystem.out.println(a == b);",
+    a: "true",
+    b: "false",
+    c: "Compilation error",
+    d: "Runtime error",
+    ans: "a"
+  },
+  {
+    q: "What is the output?\nString s = \"Java\";\ns.concat(\"World\");\nSystem.out.println(s);",
+    a: "JavaWorld",
+    b: "Java",
+    c: "Compilation error",
+    d: "Runtime error",
+    ans: "b"
+  },
+  {
+    q: "Which of the following is NOT thread-safe?",
+    a: "StringBuffer",
+    b: "Vector",
+    c: "HashMap",
+    d: "Hashtable",
+    ans: "c"
+  },
+  {
+    q: "What happens if equals() is overridden but hashCode() is not?",
+    a: "Compilation error",
+    b: "Program works correctly",
+    c: "Objects may behave incorrectly in HashMap",
+    d: "Runtime exception",
+    ans: "c"
+  },
+  {
+    q: "What is the output?\nint x = 10;\nSystem.out.println(x++ + x++);",
+    a: "20",
+    b: "21",
+    c: "22",
+    d: "23",
+    ans: "b"
+  },
+  {
+    q: "Which keyword ensures visibility of variable across threads?",
+    a: "static",
+    b: "final",
+    c: "volatile",
+    d: "transient",
+    ans: "c"
+  },
+  {
+    q: "Which exception is thrown when class is not found at runtime?",
+    a: "ClassNotFoundException",
+    b: "NoClassDefFoundError",
+    c: "IOException",
+    d: "RuntimeException",
+    ans: "b"
+  },
+  {
+    q: "Which collection does NOT allow null values at all?",
+    a: "HashMap",
+    b: "TreeMap",
+    c: "ConcurrentHashMap",
+    d: "ArrayList",
+    ans: "c"
+  },
+  {
+    q: "What will be the output?\nInteger x = 100;\nInteger y = 100;\nSystem.out.println(x == y);",
+    a: "true",
+    b: "false",
+    c: "Compilation error",
+    d: "Runtime error",
+    ans: "a"
+  },
+  {
+    q: "Which is true about abstract methods?",
+    a: "They can have body",
+    b: "They must be static",
+    c: "They must be implemented by subclass",
+    d: "They cannot be inherited",
+    ans: "c"
+  },
+  {
+    q: "What is the output?\ntry { return; } finally { System.out.println(\"Finally\"); }",
+    a: "Nothing prints",
+    b: "Finally",
+    c: "Compilation error",
+    d: "Runtime error",
+    ans: "b"
+  },
+  {
+    q: "Which collection is fail-fast?",
+    a: "CopyOnWriteArrayList",
+    b: "Vector",
+    c: "ArrayList",
+    d: "Hashtable",
+    ans: "c"
+  },
+  {
+    q: "Which scenario causes deadlock?",
+    a: "Single thread accessing multiple resources",
+    b: "Two threads waiting for each other's lock",
+    c: "Thread sleeping",
+    d: "Thread yielding",
+    ans: "b"
+  },
+  {
+    q: "Which of these is NOT a marker interface?",
+    a: "Serializable",
+    b: "Cloneable",
+    c: "Runnable",
+    d: "RandomAccess",
+    ans: "c"
+  },
+  {
+    q: "What is the output?\nSystem.out.println(Math.min(Double.NaN, 1.0));",
+    a: "1.0",
+    b: "0.0",
+    c: "NaN",
+    d: "Compilation error",
+    ans: "c"
+  },
+  {
+    q: "Which statement about constructors is TRUE?",
+    a: "They can be inherited",
+    b: "They can be overridden",
+    c: "They can be overloaded",
+    d: "They must be static",
+    ans: "c"
+  },
+  {
+    q: "Which keyword is used to avoid serialization?",
+    a: "final",
+    b: "static",
+    c: "volatile",
+    d: "transient",
+    ans: "d"
+  },
+  {
+    q: "Which JVM memory area stores class metadata?",
+    a: "Heap",
+    b: "Stack",
+    c: "Method Area",
+    d: "PC Register",
+    ans: "c"
+  },
+  {
+    q: "Which method is called before garbage collection?",
+    a: "destroy()",
+    b: "finalize()",
+    c: "gc()",
+    d: "clean()",
+    ans: "b"
+  },
+  {
+    q: "Which feature allows Java to run on any platform?",
+    a: "Compiler",
+    b: "Interpreter",
+    c: "JVM",
+    d: "JRE",
+    ans: "c"
+  }
+];
+
+
+    let index = 0;
+    let score = 0;
+    let violations = 0;
+    let time = 60;
+    let timer;
+
+    // TAB CHANGE VIOLATION
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        violations++;
+        alert("Violation detected! Do not change screen.");
+      }
+    });
+
+    // CAMERA + MIC PERMISSION
+    function requestPermission() {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+          // Permission granted
+          document.getElementById("permissionBox").style.display = "none";
+          document.getElementById("examBox").style.display = "block";
+          loadQuestion();
+        })
+        .catch(err => {
+          alert("Camera and Microphone access is mandatory to attend the test.");
+        });
+    }
+
+    function loadQuestion() {
+      clearInterval(timer);
+      time = 60;
+      document.getElementById("time").innerText = time;
+
+      const q = questions[index];
+      document.getElementById("question").innerText = (index+1) + ". " + q.q;
+      document.getElementById("a").innerText = q.a;
+      document.getElementById("b").innerText = q.b;
+      document.getElementById("c").innerText = q.c;
+      document.getElementById("d").innerText = q.d;
+
+      document.querySelectorAll('input[name="opt"]').forEach(o => o.checked=false);
+
+      timer = setInterval(() => {
+        time--;
+        document.getElementById("time").innerText = time;
+        if (time === 0) {
+          nextQuestion();
+        }
+      }, 1000);
+    }
+
+    function nextQuestion() {
+      clearInterval(timer);
+
+      const selected = document.querySelector('input[name="opt"]:checked');
+      if (selected && selected.value === questions[index].ans) {
+        score++;
+      }
+
+      index++;
+
+      if (index < questions.length) {
+        loadQuestion();
+      } else {
+        finishTest();
+      }
+    }
+
+    function finishTest() {
+      const result = score >= 15 ? "PASS" : "FAIL";
+
+      fetch("http://localhost:8080/saveResult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: localStorage.getItem("name"),
+          email: localStorage.getItem("email"),
+          score: score,
+          violations: violations
+        })
+      });
+
+      alert(
+        "Test Completed\n" +
+        "Score: " + score + "/20\n" +
+        "Violations: " + violations + "\n" +
+        "Result: " + result
+      );
+    }
+</script>
+
+</body>
+</html>
